@@ -1,0 +1,1129 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>แผนธุรกิจไวน์จากไร่องุ่น - นายคิดมากเลย (Premium Enhanced)</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600&family=Prompt:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            /* Premium Wine Palette */
+            --primary: #722F37;
+            /* Merlot */
+            --primary-dark: #4A1A21;
+            --secondary: #F9F7F2;
+            /* Cream/Paper */
+            --text-main: #2D2D2D;
+            --text-light: #555555;
+            --accent: #C5A059;
+            /* Gold/Bronze */
+            --white: #FFFFFF;
+            --shadow-soft: 0 15px 40px rgba(114, 47, 55, 0.1);
+            --shadow-hover: 0 25px 50px rgba(114, 47, 55, 0.2);
+            --border-light: rgba(114, 47, 55, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            font-size: 16px;
+            /* Reset to standard 16px to fix zoom issue */
+        }
+
+        body {
+            font-family: 'Sarabun', sans-serif;
+            background-color: var(--secondary);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: 'Prompt', sans-serif;
+            color: var(--primary);
+            line-height: 1.2;
+        }
+
+        .serif-accent {
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+        }
+
+        /* New Visual Styles */
+        .text-gradient {
+            background: linear-gradient(45deg, var(--primary), #8B3A44, var(--accent), var(--primary));
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 8s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Floating Decoration */
+        .bg-decor {
+            position: absolute;
+            opacity: 0.05;
+            pointer-events: none;
+            z-index: 0;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .bg-decor.blob-1 {
+            width: 300px;
+            height: 300px;
+            background: var(--primary);
+            border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+            filter: blur(40px);
+        }
+
+        .bg-decor.icon {
+            font-size: 15rem;
+            color: var(--primary);
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px) rotate(0deg);
+            }
+
+            50% {
+                transform: translateY(-20px) rotate(2deg);
+            }
+
+            100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+        }
+
+        /* Scroll Snap Container */
+        .presentation-container {
+            height: 100vh;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+        }
+
+        .slide {
+            height: 100vh;
+            width: 100%;
+            scroll-snap-align: start;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 4rem;
+            /* More horizontal padding */
+            position: relative;
+            background: var(--secondary);
+            overflow: hidden;
+            /* Subtle Pattern */
+            background-image: radial-gradient(#722F37 0.5px, transparent 0.5px), radial-gradient(#722F37 0.5px, var(--secondary) 0.5px);
+            background-size: 20px 20px;
+            background-position: 0 0, 10px 10px;
+            background-blend-mode: multiply;
+            opacity: 1;
+        }
+
+        /* Fade the pattern */
+        .slide::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--secondary);
+            opacity: 0.95;
+            /* Make pattern very subtle */
+            z-index: 0;
+        }
+
+        /* Alternating Backgrounds */
+        .slide:nth-child(even) {
+            background: #FFFFFF;
+            background-image: radial-gradient(#C5A059 0.5px, transparent 0.5px), radial-gradient(#C5A059 0.5px, #FFFFFF 0.5px);
+        }
+
+        .slide:nth-child(even)::before {
+            background: #FFFFFF;
+            opacity: 0.95;
+        }
+
+        .slide-content {
+            max-width: 1600px;
+            /* Widen container */
+            width: 95%;
+            margin: 0 auto;
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 1s ease-out;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            height: 100%;
+        }
+
+        /* Animation Trigger */
+        .slide.active .slide-content {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Typography Utilities */
+        .text-center {
+            text-align: center;
+        }
+
+        .text-accent {
+            color: var(--accent);
+        }
+
+        .mb-1 {
+            margin-bottom: 0.5rem;
+        }
+
+        .mb-2 {
+            margin-bottom: 1.5rem;
+        }
+
+        .mb-3 {
+            margin-bottom: 2rem;
+        }
+
+        /* Section Titles */
+        .section-header {
+            text-align: center;
+            margin-bottom: 3vh;
+            /* Responsive margin */
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .section-title {
+            font-size: clamp(3rem, 6vw, 5rem);
+            /* Even Larger headings */
+            font-weight: 700;
+            margin-bottom: 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        .section-subtitle {
+            font-size: 1.5rem;
+            color: var(--text-light);
+            font-family: 'Playfair Display', serif;
+            font-style: italic;
+        }
+
+        .section-header::after {
+            content: '';
+            display: block;
+            width: 100px;
+            height: 5px;
+            background: var(--accent);
+            margin: 1rem auto 0;
+        }
+
+        /* Cards */
+        .card {
+            background: rgba(255, 255, 255, 0.85);
+            padding: 2rem;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 8px 32px 0 rgba(114, 47, 55, 0.1);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(114, 47, 55, 0.2);
+            border-color: var(--accent);
+        }
+
+        /* Card Sheen Effect */
+        .card {
+            overflow: hidden;
+            position: relative;
+        }
+
+        .card::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 50%;
+            height: 100%;
+            background: linear-gradient(to right, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.3) 50%, rgba(255, 255, 255, 0) 100%);
+            transform: skewX(-25deg);
+            transition: all 0.75s;
+            pointer-events: none;
+        }
+
+        .card:hover::after {
+            left: 125%;
+        }
+
+        /* Reveal Animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Stagger delays */
+        .delay-100 {
+            transition-delay: 0.1s;
+        }
+
+        .delay-200 {
+            transition-delay: 0.2s;
+        }
+
+        .delay-300 {
+            transition-delay: 0.3s;
+        }
+
+        .delay-400 {
+            transition-delay: 0.4s;
+        }
+
+        .card h3 {
+            font-size: 1.6rem;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card i {
+            color: var(--accent);
+        }
+
+        /* Grids */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 3rem;
+            flex-grow: 1;
+            align-content: center;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            flex-grow: 1;
+            align-content: center;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            flex-grow: 1;
+            align-content: center;
+        }
+
+        /* Slide 1: Hero */
+        .hero-slide {
+            background: linear-gradient(rgba(74, 26, 33, 0.85), rgba(74, 26, 33, 0.7)), url('https://images.unsplash.com/photo-1506377247377-2a5b3b417ebb?auto=format&fit=crop&w=1920&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            /* Parallax */
+            color: var(--white);
+        }
+
+        .hero-slide::before {
+            display: none;
+        }
+
+        /* No pattern overlay for hero */
+
+        .hero-slide .section-title,
+        .hero-slide .section-subtitle,
+        .hero-slide h1,
+        .hero-slide h2,
+        .hero-slide h3,
+        .hero-slide p {
+            color: var(--white);
+        }
+
+        .hero-title {
+            font-size: clamp(3.5rem, 7vw, 6rem);
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            line-height: 1.1;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 3rem;
+            margin-top: 5rem;
+        }
+
+        .hero-item {
+            text-align: center;
+            padding: 3rem 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            backdrop-filter: blur(8px);
+            background: rgba(255, 255, 255, 0.05);
+            transition: transform 0.3s;
+        }
+
+        .hero-item:hover {
+            transform: translateY(-10px);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .hero-item i {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent);
+        }
+
+        .hero-item h3 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+            color: var(--white);
+        }
+
+        /* Slide 2: Promo */
+        .promo-list {
+            list-style: none;
+        }
+
+        .promo-list li {
+            margin-bottom: 1.2rem;
+            padding-left: 2rem;
+            position: relative;
+            font-size: 1.1rem;
+        }
+
+        .promo-list li::before {
+            content: '\f00c';
+            /* FontAwesome check */
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            color: var(--accent);
+            position: absolute;
+            left: 0;
+            font-size: 1.2rem;
+        }
+
+        .special-promo {
+            background: var(--primary);
+            color: var(--white);
+            text-align: center;
+            padding: 3rem;
+            border-radius: 16px;
+            margin-top: 3rem;
+            box-shadow: 0 20px 40px rgba(114, 47, 55, 0.3);
+        }
+
+        .special-promo h3 {
+            color: var(--accent);
+            font-size: 2.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .special-promo p {
+            font-size: 1.3rem;
+        }
+
+        /* Slide 3: Products */
+        .product-image {
+            width: 100%;
+            height: 200px;
+            background-color: #ddd;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .product-card {
+            text-align: center;
+        }
+
+        .price-tag {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            color: var(--primary);
+            font-weight: 700;
+            margin: 1rem 0;
+        }
+
+        .price-label {
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-light);
+            font-weight: 600;
+        }
+
+        /* Slide 4: Location */
+        .location-highlight {
+            background: var(--primary);
+            color: var(--white);
+            padding: 4rem;
+            border-radius: 16px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .location-highlight h2 {
+            color: var(--white);
+            font-size: 4rem;
+        }
+
+        .location-details {
+            padding: 3rem;
+        }
+
+        .location-details li {
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            font-size: 1.2rem;
+        }
+
+        .location-details li i {
+            color: var(--primary);
+            margin-right: 1.5rem;
+            font-size: 1.5rem;
+            width: 30px;
+            text-align: center;
+        }
+
+        /* Slide 5: Investment Chart */
+        .chart-container {
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            gap: 4rem;
+            height: 400px;
+            margin: 3rem 0;
+            padding-bottom: 2rem;
+            border-bottom: 2px solid var(--border-light);
+        }
+
+        .chart-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 150px;
+            position: relative;
+            height: 100%;
+            justify-content: flex-end;
+        }
+
+        .chart-bar {
+            width: 100%;
+            background: linear-gradient(to top, var(--primary), #8B3A44);
+            border-radius: 12px 12px 0 0;
+            position: relative;
+            transition: height 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+            box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-value {
+            /* Removed absolute positioning */
+            width: 200%;
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            font-family: 'Playfair Display', serif;
+            margin-bottom: 0.5rem;
+        }
+
+        .chart-label {
+            margin-top: 1.5rem;
+            font-weight: 600;
+            font-size: 1.2rem;
+            text-align: center;
+            color: var(--text-light);
+        }
+
+        /* Slide 6 & 7: SWOT */
+        .swot-card {
+            position: relative;
+            padding-left: 2.5rem;
+            overflow: hidden;
+        }
+
+        .swot-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 6px;
+            height: 100%;
+            background: var(--accent);
+        }
+
+        .swot-icon {
+            font-size: 3rem;
+            color: rgba(114, 47, 55, 0.1);
+            position: absolute;
+            right: 1rem;
+            top: 1rem;
+            transition: all 0.3s;
+        }
+
+        .swot-card:hover .swot-icon {
+            color: rgba(197, 160, 89, 0.2);
+            transform: scale(1.2) rotate(10deg);
+        }
+
+        /* Slide 8: Inspiration */
+        .inspiration-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 4rem;
+        }
+
+        .inspiration-item {
+            border-left: 4px solid var(--accent);
+            padding-left: 2.5rem;
+        }
+
+        .inspiration-item h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            color: var(--accent);
+        }
+
+        .inspiration-item p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        /* Navigation Dots */
+        .nav-dots {
+            position: fixed;
+            right: 3rem;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            z-index: 100;
+        }
+
+        .nav-dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+
+        .nav-dot.active {
+            background: var(--primary);
+            transform: scale(1.5);
+            border-color: var(--white);
+            box-shadow: 0 0 10px rgba(114, 47, 55, 0.5);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            html {
+                font-size: 16px;
+            }
+
+            .hero-title {
+                font-size: 4rem;
+            }
+
+            .grid-2,
+            .grid-3,
+            .grid-4,
+            .hero-grid,
+            .inspiration-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .slide {
+                height: auto;
+                min-height: 100vh;
+                padding: 6rem 2rem;
+            }
+
+            .presentation-container {
+                scroll-snap-type: none;
+            }
+
+            .chart-container {
+                height: 300px;
+                gap: 2rem;
+            }
+
+            .nav-dots {
+                right: 1rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="nav-dots">
+        <div class="nav-dot active" onclick="scrollToSlide(0)"></div>
+        <div class="nav-dot" onclick="scrollToSlide(1)"></div>
+        <div class="nav-dot" onclick="scrollToSlide(2)"></div>
+        <div class="nav-dot" onclick="scrollToSlide(3)"></div>
+        <div class="nav-dot" onclick="scrollToSlide(4)"></div>
+        <div class="nav-dot" onclick="scrollToSlide(5)"></div>
+        <div class="nav-dot" onclick="scrollToSlide(6)"></div>
+        <div class="nav-dot" onclick="scrollToSlide(7)"></div>
+    </div>
+
+    <div class="presentation-container" id="container">
+
+        <!-- Slide 1: Hero -->
+        <section class="slide hero-slide active">
+            <div class="slide-content text-center">
+                <p class="serif-accent" style="font-size: 2rem; margin-bottom: 1.5rem; color: var(--accent);">Business
+                    Plan Presentation</p>
+                <h1 class="hero-title">การตลาดและการประชาสัมพันธ์</h1>
+                <p class="section-subtitle" style="color: rgba(255,255,255,0.9); font-size: 1.8rem;">
+                    ธุรกิจไวน์จากไร่องุ่นของตนเอง</p>
+
+                <div class="hero-grid">
+                    <div class="hero-item">
+                        <i class="fas fa-plane-arrival"></i>
+                        <h3>นักท่องเที่ยว</h3>
+                        <p>ทั้งชาวไทยและต่างชาติ</p>
+                    </div>
+                    <div class="hero-item">
+                        <i class="fas fa-utensils"></i>
+                        <h3>ร้านอาหาร/โรงแรม</h3>
+                        <p>คู่ค้าทางธุรกิจและรีสอร์ต</p>
+                    </div>
+                    <div class="hero-item">
+                        <i class="fas fa-wine-glass-cheers"></i>
+                        <h3>คนรักไวน์</h3>
+                        <p>กลุ่มลูกค้า Premium</p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 4rem; color: rgba(255,255,255,0.9); font-size: 1.2rem;">
+                    <p><i class="fas fa-check-circle" style="color: var(--accent);"></i> หน้าร้าน &nbsp;•&nbsp; <i
+                            class="fas fa-check-circle" style="color: var(--accent);"></i> ตัวแทนจำหน่าย &nbsp;•&nbsp;
+                        <i class="fas fa-check-circle" style="color: var(--accent);"></i> Social Media &nbsp;•&nbsp; <i
+                            class="fas fa-check-circle" style="color: var(--accent);"></i> Wine Tasting
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 2: Promotion -->
+        <section class="slide">
+            <div class="slide-content">
+                <div class="section-header reveal">
+                    <h2 class="section-title text-gradient">ส่งเสริมการขาย</h2>
+                    <p class="section-subtitle">Sales Promotion Strategy</p>
+                </div>
+                <div class="bg-decor icon" style="top: 10%; left: 5%;"><i class="fas fa-wine-glass-alt"></i></div>
+                <div class="bg-decor blob-1" style="bottom: -10%; right: -10%; background: var(--accent);"></div>
+
+                <div class="grid-2">
+                    <div class="card reveal delay-100">
+                        <h3><i class="fas fa-tags"></i> โปรโมชั่นลดราคา</h3>
+                        <ul class="promo-list" style="margin-top: 1.5rem;">
+                            <li>ซื้อ 3 ขวด แถม 1 ขวด</li>
+                            <li>ลด 10-20% เมื่อซื้อครบจำนวน</li>
+                            <li>Early Bird: ลด 5% ก่อนเทศกาล</li>
+                        </ul>
+                    </div>
+                    <div class="card reveal delay-200">
+                        <h3><i class="fas fa-gift"></i> แพ็กเกจของขวัญ</h3>
+                        <ul class="promo-list" style="margin-top: 1.5rem;">
+                            <li>ชุด Gift Set พร้อมแก้วไวน์</li>
+                            <li>แพ็กคู่ (ขวดใหญ่+เล็ก) ลด 15%</li>
+                            <li>บริการห่อของขวัญ Premium</li>
+                        </ul>
+                    </div>
+                    <div class="card reveal delay-300">
+                        <h3><i class="fas fa-id-card"></i> สมาชิก & สะสมแต้ม</h3>
+                        <ul class="promo-list" style="margin-top: 1.5rem;">
+                            <li>สะสมครบ 5 ขวด รับฟรี 1 ขวด</li>
+                            <li>คูปองส่วนลดสำหรับการซื้อซ้ำ</li>
+                        </ul>
+                    </div>
+                    <div class="card reveal delay-400">
+                        <h3><i class="fas fa-globe"></i> ออนไลน์</h3>
+                        <ul class="promo-list" style="margin-top: 1.5rem;">
+                            <li>ส่งฟรีเมื่อซื้อครบ 1,500 บาท</li>
+                            <li>กิจกรรม Share & Like รับส่วนลด</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="special-promo">
+                    <h3><i class="fas fa-birthday-cake"></i> Birthday Special</h3>
+                    <p>สิทธิพิเศษเดือนเกิด: ลด 15-20% พร้อมของที่ระลึกจากทางไร่</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 3: Products -->
+        <section class="slide">
+            <div class="slide-content">
+                <div class="section-header">
+                    <h2 class="section-title text-gradient">สินค้าและราคา</h2>
+                    <p class="section-subtitle">Products & Pricing</p>
+                </div>
+                <div class="bg-decor icon" style="bottom: 20%; right: 5%; transform: rotate(15deg);"><i
+                        class="fas fa-wine-bottle"></i></div>
+
+                <div class="grid-2 mb-3">
+                    <div class="card">
+                        <h3><i class="fas fa-wine-bottle"></i> ประเภทสินค้า</h3>
+                        <p class="mb-1"><strong>Red Wine:</strong> เข้มข้น จากองุ่นพันธุ์ดี</p>
+                        <p class="mb-1"><strong>White Wine:</strong> สดชื่น กลิ่นหอมผลไม้</p>
+                        <p><strong>Rosé Wine:</strong> สีสวย ดื่มง่าย รสกลมกล่อม</p>
+                    </div>
+                    <div class="card">
+                        <h3><i class="fas fa-star"></i> จุดเด่น</h3>
+                        <p>ผลิตจากองุ่นในไร่ 100% ควบคุมคุณภาพทุกขั้นตอน (Estate Grown) รสชาติเป็นเอกลักษณ์ของไวน์ไทย
+                        </p>
+                    </div>
+                </div>
+
+                <div class="grid-3">
+                    <div class="card product-card">
+                        <div class="product-image"
+                            style="background-image: url('https://images.unsplash.com/photo-1559563362-c667ba5f5480?auto=format&fit=crop&w=500&q=80');">
+                        </div>
+                        <div class="price-label">Standard Bottle</div>
+                        <div class="price-tag">349 ฿</div>
+                        <p>ขนาด 750 ml</p>
+                    </div>
+                    <div class="card product-card">
+                        <div class="product-image"
+                            style="background-image: url('https://images.unsplash.com/photo-1585553616435-2dc0a54e271d?auto=format&fit=crop&w=500&q=80');">
+                        </div>
+                        <div class="price-label">Half Bottle</div>
+                        <div class="price-tag">199 ฿</div>
+                        <p>ขนาด 375 ml</p>
+                    </div>
+                    <div class="card product-card">
+                        <div class="product-image"
+                            style="background-image: url('https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&w=500&q=80');">
+                        </div>
+                        <div class="price-label">Gift Set</div>
+                        <div class="price-tag">699 ฿</div>
+                        <p>ชุดของขวัญพิเศษ</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 4: Location -->
+        <section class="slide">
+            <div class="slide-content">
+                <div class="section-header">
+                    <h2 class="section-title text-gradient">ทำเลที่ตั้ง</h2>
+                    <p class="section-subtitle">Location & Geography</p>
+                </div>
+                <div class="bg-decor blob-1" style="top: -50px; left: -50px;"></div>
+
+                <div class="grid-2">
+                    <div class="location-highlight">
+                        <h3 style="color: var(--accent); margin-bottom: 1.5rem; font-size: 2rem;">Main Base</h3>
+                        <h2 style="margin-bottom: 1.5rem;">เชียงใหม่</h2>
+                        <p style="font-size: 1.5rem;">พื้นที่ไร่รวม 100 ไร่ กระจายตัวเพื่อลดความเสี่ยง</p>
+                    </div>
+                    <div class="card location-details">
+                        <h3><i class="fas fa-map-marked-alt"></i> ศักยภาพพื้นที่</h3>
+                        <ul style="list-style: none; margin-top: 2rem;">
+                            <li><i class="fas fa-cloud-sun"></i> สภาพอากาศเย็นตลอดปี เหมาะแก่การปลูกองุ่น</li>
+                            <li><i class="fas fa-camera"></i> แหล่งท่องเที่ยวสำคัญ ดึงดูดลูกค้าได้ง่าย</li>
+                            <li><i class="fas fa-industry"></i> มีโรงงานผลิตในพื้นที่ ลดต้นทุนขนส่ง</li>
+                            <li><i class="fas fa-route"></i> รองรับกิจกรรม Wine Tourism ครบวงจร</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 5: Investment -->
+        <section class="slide">
+            <div class="slide-content">
+                <div class="section-header">
+                    <h2 class="section-title text-gradient">การลงทุน</h2>
+                    <p class="section-subtitle">Financial Overview</p>
+                </div>
+                <div class="bg-decor icon" style="top: 20%; left: 2%; font-size: 10rem;"><i class="fas fa-coins"></i>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-group">
+                        <div class="chart-value" data-target="7.5">0</div>
+                        <div class="chart-bar" style="height: 0;" data-height="65%"></div>
+                        <div class="chart-label">เงินลงทุนเริ่มต้น</div>
+                    </div>
+                    <div class="chart-group">
+                        <div class="chart-value" data-target="3.9">0</div>
+                        <div class="chart-bar" style="height: 0;" data-height="35%"></div>
+                        <div class="chart-label">ต้นทุนดำเนินงาน/ปี</div>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <div class="card text-center">
+                        <h3><i class="fas fa-coins"></i> รายละเอียดลงทุน</h3>
+                        <p>เตรียมพื้นที่, โรงงาน, เครื่องจักร, การตลาดเริ่มต้น</p>
+                    </div>
+                    <div class="card text-center">
+                        <h3><i class="fas fa-chart-line"></i> รายละเอียดต้นทุน</h3>
+                        <p>ค่าแรง, ดูแลรักษา, ผลิตและบรรจุ, ขนส่ง</p>
+                    </div>
+                </div>
+
+                <div class="total-investment">
+                    <h3>รวมต้นทุนปีแรก: 11.4 ล้านบาท</h3>
+                    <div style="margin-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 1.5rem;">
+                        <p><strong>ประมาณการรายรับ:</strong> 698,000 บาท/เดือน (ยอดขาย 2,000 ขวด)</p>
+                        <p style="font-size: 1rem; opacity: 0.8;">กำไรขั้นต้นต่อขวดประมาณ 149 บาท</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 6: Strengths -->
+        <section class="slide">
+            <div class="slide-content">
+                <div class="section-header">
+                    <h2 class="section-title text-gradient">จุดแข็ง</h2>
+                    <p class="section-subtitle">Strengths</p>
+                </div>
+
+                <div class="grid-2">
+                    <div class="card swot-card">
+                        <i class="fas fa-seedling swot-icon"></i>
+                        <h3>Own Vineyard</h3>
+                        <p>มีไร่องุ่นเป็นของตนเอง ควบคุมคุณภาพวัตถุดิบได้ 100% ตั้งแต่ต้นน้ำ</p>
+                    </div>
+                    <div class="card swot-card">
+                        <i class="fas fa-shield-alt swot-icon"></i>
+                        <h3>Risk Management</h3>
+                        <p>พื้นที่กระจายหลายจังหวัด ลดความเสี่ยงจากภัยธรรมชาติและโรคพืช</p>
+                    </div>
+                    <div class="card swot-card">
+                        <i class="fas fa-map-marked swot-icon"></i>
+                        <h3>Tourism Hub</h3>
+                        <p>ตั้งอยู่ในเชียงใหม่ เมืองท่องเที่ยวระดับโลก เอื้อต่อธุรกิจท่องเที่ยวเชิงเกษตร</p>
+                    </div>
+                    <div class="card swot-card">
+                        <i class="fas fa-flag swot-icon"></i>
+                        <h3>Thai Identity</h3>
+                        <p>สร้างแบรนด์ไวน์ไทยที่มีเอกลักษณ์ สนับสนุนเกษตรกรท้องถิ่น</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 7: Weaknesses -->
+        <section class="slide">
+            <div class="slide-content">
+                <div class="section-header">
+                    <h2 class="section-title text-gradient">จุดอ่อน & แนวทางแก้ไข</h2>
+                    <p class="section-subtitle">Weaknesses & Solutions</p>
+                </div>
+
+                <div class="grid-2">
+                    <div class="card swot-card">
+                        <i class="fas fa-money-bill-wave swot-icon"></i>
+                        <h3>Capital Intensive</h3>
+                        <p>ใช้เงินลงทุนสูง คืนทุนช้า <br><span class="text-accent">→ วางแผนการเงินระยะยาว</span></p>
+                    </div>
+                    <div class="card swot-card">
+                        <i class="fas fa-user-graduate swot-icon"></i>
+                        <h3>Expertise Required</h3>
+                        <p>ต้องใช้ผู้เชี่ยวชาญเฉพาะด้าน <br><span class="text-accent">→
+                                จ้างที่ปรึกษาและพัฒนาทีมงาน</span></p>
+                    </div>
+                    <div class="card swot-card">
+                        <i class="fas fa-cloud-showers-heavy swot-icon"></i>
+                        <h3>Weather Risk</h3>
+                        <p>ความเสี่ยงจากสภาพอากาศ <br><span class="text-accent">→ กระจายพื้นที่ปลูก</span></p>
+                    </div>
+                    <div class="card swot-card">
+                        <i class="fas fa-gavel swot-icon"></i>
+                        <h3>Regulations</h3>
+                        <p>ข้อจำกัดทางกฎหมายและภาษี <br><span class="text-accent">→
+                                ศึกษาและปฏิบัติตามอย่างเคร่งครัด</span></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 8: Inspiration -->
+        <section class="slide">
+            <div class="slide-content">
+                <div class="section-header">
+                    <h2 class="section-title text-gradient">แรงบันดาลใจ</h2>
+                    <p class="section-subtitle">Inspiration & Vision</p>
+                </div>
+
+                <div class="inspiration-grid">
+                    <div class="inspiration-item">
+                        <h3><i class="fas fa-leaf"></i> Passion for Agriculture</h3>
+                        <p>ความสนใจในการเกษตรแปรรูป ต้องการเพิ่มมูลค่าให้ผลผลิตไทย</p>
+                    </div>
+                    <div class="inspiration-item">
+                        <h3><i class="fas fa-chart-line"></i> Market Opportunity</h3>
+                        <p>เห็นศักยภาพของตลาดไวน์ไทยที่กำลังเติบโต และได้รับการยอมรับมากขึ้น</p>
+                    </div>
+                    <div class="inspiration-item">
+                        <h3><i class="fas fa-map-pin"></i> Perfect Location</h3>
+                        <p>เชียงใหม่มีความพร้อมทั้งด้านภูมิประเทศและการท่องเที่ยว</p>
+                    </div>
+                    <div class="inspiration-item">
+                        <h3><i class="fas fa-hands-helping"></i> Sustainability</h3>
+                        <p>สร้างธุรกิจที่ยั่งยืน กระจายรายได้สู่ชุมชนและเกษตรกร</p>
+                    </div>
+                </div>
+
+                <div class="text-center"
+                    style="margin-top: 6rem; padding-top: 3rem; border-top: 1px solid rgba(255,255,255,0.1);">
+                    <p class="serif-accent" style="font-size: 2rem;">Thank You</p>
+                </div>
+            </div>
+        </section>
+
+    </div>
+
+    <script>
+        const container = document.getElementById('container');
+        const slides = document.querySelectorAll('.slide');
+        const dots = document.querySelectorAll('.nav-dot');
+        const charts = document.querySelectorAll('.chart-bar');
+        const countValues = document.querySelectorAll('.chart-value');
+        let chartAnimated = false;
+
+        // Reveal Observer
+        const revealObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    // animate charts if visible
+                    if (entry.target.querySelector('.chart-bar') && !chartAnimated) {
+                        animateCharts();
+                    }
+                }
+            });
+        }, { threshold: 0.2 });
+
+        document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+        slides.forEach(el => revealObserver.observe(el)); // Also observe slides for navigation tracking
+
+        function animateCharts() {
+            chartAnimated = true;
+            // Bars
+            charts.forEach(chart => {
+                chart.style.height = chart.getAttribute('data-height');
+            });
+            // Numbers
+            countValues.forEach(counter => {
+                const target = parseFloat(counter.getAttribute('data-target'));
+                animateValue(counter, 0, target, 2000);
+            });
+        }
+
+        function animateValue(obj, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                // Ease out quart
+                const easeProgress = 1 - Math.pow(1 - progress, 4);
+
+                obj.innerHTML = (progress * (end - start) + start).toFixed(1) + " M";
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
+        // Update active state on scroll (Legacy + Observer hybrid)
+        container.addEventListener('scroll', () => {
+            let current = '';
+            slides.forEach((slide, index) => {
+                const slideTop = slide.offsetTop;
+                if (container.scrollTop >= (slideTop - window.innerHeight / 2)) {
+                    current = index;
+                }
+            });
+
+            dots.forEach(dot => dot.classList.remove('active'));
+            if (dots[current]) dots[current].classList.add('active');
+
+            // Trigger reveals within active slide manually if observer misses (safety)
+            if (slides[current]) {
+                slides[current].querySelectorAll('.reveal').forEach(r => r.classList.add('active'));
+            }
+        });
+
+        function scrollToSlide(index) {
+            slides[index].scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Trigger first slide
+        setTimeout(() => {
+            slides[0].classList.add('active');
+            slides[0].querySelectorAll('.reveal').forEach(r => r.classList.add('active'));
+        }, 100);
+    </script>
+</body>
+
+</html>
