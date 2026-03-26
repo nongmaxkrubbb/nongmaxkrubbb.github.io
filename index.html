@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ระบบตรวจจับป้ายทะเบียนรถ</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Sarabun:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --panel: #0f1628;
+    --card: #131c35;
+    --border: #1e2d54;
+    --accent: #00d4ff;
+    --accent2: #ff6b35;
+    --green: #00ff88;
+    --red: #ff3355;
+    --yellow: #ffd700;
+    --text: #e0eaff;
+    --muted: #5a7ab5;
+    --glow: 0 0 20px rgba(0,212,255,0.3);
+    --glow2: 0 0 20px rgba(0,255,136,0.3);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    background: var(--bg);
+    font-family: 'Sarabun', sans-serif;
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* grid bg */
+  body::before {
+    content:'';
+    position:fixed;
+    inset:0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events:none;
+    z-index:0;
+  }
+
+  .app { position:relative; z-index:1; max-width:1400px; margin:0 auto; padding:24px; }
+
+  /* HEADER */
+  header {
+    display:flex; align-items:center; gap:16px;
+    padding: 20px 32px;
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    margin-bottom: 24px;
+    box-shadow: var(--glow);
+    position:relative; overflow:hidden;
+  }
+  header::after {
+    content:'';
+    position:absolute; top:0; left:0; right:0; height:2px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    animation: scanline 3s linear infinite;
+  }
+  @keyframes scanline {
+    0%{transform:translateX(-100%)} 100%{transform:translateX(100%)}
+  }
+  .logo-icon {
+    width:52px; height:52px;
+    background: linear-gradient(135deg, var(--accent), #0066ff);
+    border-radius:12px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:26px; box-shadow: var(--glow);
+    flex-shrink:0;
+  }
+  .header-title h1 {
+    font-family:'Orbitron', monospace;
+    font-size:20px; font-weight:900;
+    color: var(--accent);
+    letter-spacing:2px;
+    text-shadow: var(--glow);
+  }
+  .header-title p { font-size:13px; color:var(--muted); margin-top:2px; }
+  .status-badge {
+    margin-left:auto;
+    display:flex; align-items:center; gap:8px;
+    background: rgba(0,255,136,0.1);
+    border: 1px solid rgba(0,255,136,0.3);
+    padding:8px 16px; border-radius:20px;
+    font-size:13px; font-weight:600; color:var(--green);
+  }
+  .dot {
+    width:8px; height:8px; border-radius:50%;
+    background:var(--green);
+    animation: pulse 1.5s ease-in-out infinite;
+    box-shadow:0 0 8px var(--green);
+  }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }
+
+  /* STATS ROW */
+  .stats-row {
+    display:grid; grid-template-columns:repeat(4,1fr); gap:16px;
+    margin-bottom:24px;
+  }
+  .stat-card {
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:12px;
+    padding:18px 20px;
+    position:relative; overflow:hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .stat-card:hover { transform:translateY(-2px); box-shadow:var(--glow); }
+  .stat-card::before {
+    content:'';
+    position:absolute; top:0; left:0; bottom:0; width:3px;
+  }
+  .stat-card.blue::before { background:var(--accent); }
+  .stat-card.green::before { background:var(--green); }
+  .stat-card.orange::before { background:var(--accent2); }
+  .stat-card.yellow::before { background:var(--yellow); }
+  .stat-label { font-size:12px; color:var(--muted); margin-bottom:6px; text-transform:uppercase; letter-spacing:1px; }
+  .stat-value { font-family:'Orbitron',monospace; font-size:28px; font-weight:700; }
+  .stat-card.blue .stat-value { color:var(--accent); }
+  .stat-card.green .stat-value { color:var(--green); }
+  .stat-card.orange .stat-value { color:var(--accent2); }
+  .stat-card.yellow .stat-value { color:var(--yellow); }
+
+  /* MAIN GRID */
+  .main-grid {
+    display:grid; grid-template-columns:1fr 380px; gap:24px;
+  }
+
+  /* CAMERA PANEL */
+  .camera-panel {
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:16px;
+    overflow:hidden;
+  }
+  .panel-header {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 20px;
+    border-bottom:1px solid var(--border);
+  }
+  .panel-title {
+    font-family:'Orbitron',monospace;
+    font-size:13px; font-weight:700;
+    color:var(--accent); letter-spacing:2px;
+  }
+  .camera-view {
+    position:relative;
+    background:#060a14;
+    height:380px;
+    overflow:hidden;
+  }
+  .road-scene {
+    width:100%; height:100%;
+    position:relative;
+    background: linear-gradient(180deg, #0a0e1a 0%, #060a14 60%, #111827 100%);
+  }
+  /* Road */
+  .road {
+    position:absolute; bottom:0; left:0; right:0; height:55%;
+    background:linear-gradient(180deg, #1a1a2e 0%, #0d0d1a 100%);
+    border-top:3px solid #333;
+  }
+  .road-line {
+    position:absolute; top:40%; left:50%; transform:translateX(-50%);
+    width:6px; height:100%;
+    background: repeating-linear-gradient(180deg, #ffd700 0, #ffd700 30px, transparent 30px, transparent 60px);
+    animation: roadAnim 0.5s linear infinite;
+  }
+  @keyframes roadAnim { 0%{background-position:0 0} 100%{background-position:0 60px} }
+  .road-edge-left, .road-edge-right {
+    position:absolute; top:0; bottom:0; width:4px;
+    background:#fff; opacity:0.6;
+  }
+  .road-edge-left { left:10%; }
+  .road-edge-right { right:10%; }
+
+  /* Car on road */
+  .car-container {
+    position:absolute; bottom:20%; left:50%; transform:translateX(-50%);
+    animation: carBob 2s ease-in-out infinite;
+  }
+  @keyframes carBob { 0%,100%{transform:translateX(-50%) translateY(0)} 50%{transform:translateX(-50%) translateY(-3px)} }
+  .car-body {
+    width:120px; height:70px;
+    background:var(--car-color, #2563eb);
+    border-radius:12px 12px 6px 6px;
+    position:relative;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.6), 0 0 30px rgba(37,99,235,0.2);
+  }
+  .car-roof {
+    position:absolute; top:-30px; left:15px; right:15px; height:30px;
+    background:inherit; filter:brightness(0.8);
+    border-radius:8px 8px 0 0;
+    clip-path: polygon(10% 100%, 0% 0%, 100% 0%, 90% 100%);
+  }
+  .car-window {
+    position:absolute; top:-26px; left:20px; right:20px; height:22px;
+    background:rgba(100,200,255,0.3);
+    border-radius:4px 4px 0 0;
+    clip-path: polygon(8% 100%, 2% 0%, 98% 0%, 92% 100%);
+  }
+  .car-lights {
+    position:absolute; top:10px; display:flex; gap:6px;
+  }
+  .car-lights.front { left:4px; }
+  .car-lights.back { right:4px; }
+  .light {
+    width:10px; height:18px; border-radius:3px;
+    background: var(--light-color, #ffd700);
+    box-shadow: 0 0 10px var(--light-color, #ffd700);
+    animation: lightPulse 1s ease-in-out infinite;
+  }
+  .light.red { --light-color:#ff4444; }
+  @keyframes lightPulse { 0%,100%{opacity:1} 50%{opacity:0.7} }
+  .car-wheels {
+    position:absolute; bottom:-10px; left:0; right:0;
+    display:flex; justify-content:space-between; padding:0 12px;
+  }
+  .wheel {
+    width:24px; height:24px; border-radius:50%;
+    background:#1a1a1a;
+    border:3px solid #444;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+
+  /* License plate on car */
+  .plate-on-car {
+    position:absolute; bottom:8px; left:50%; transform:translateX(-50%);
+    background:#fff;
+    border:2px solid #000;
+    border-radius:4px;
+    padding:2px 6px;
+    font-family:'Orbitron',monospace;
+    font-size:9px; font-weight:700;
+    color:#000; white-space:nowrap;
+    box-shadow:0 2px 8px rgba(0,0,0,0.5);
+  }
+
+  /* Scan overlay */
+  .scan-overlay {
+    position:absolute; inset:0;
+    pointer-events:none;
+  }
+  .scan-frame {
+    position:absolute; bottom:22%; left:50%; transform:translateX(-50%);
+    width:160px; height:90px;
+    border:2px solid var(--accent);
+    border-radius:4px;
+    box-shadow: var(--glow), inset 0 0 20px rgba(0,212,255,0.1);
+    animation: frameGlow 1.5s ease-in-out infinite;
+  }
+  @keyframes frameGlow {
+    0%,100%{border-color:var(--accent); box-shadow:var(--glow)}
+    50%{border-color:#00ff88; box-shadow:var(--glow2)}
+  }
+  .scan-line {
+    position:absolute; left:0; right:0; height:2px;
+    background:linear-gradient(90deg, transparent, var(--accent), transparent);
+    top:0;
+    animation: scanMove 1.2s ease-in-out infinite;
+  }
+  @keyframes scanMove {
+    0%{top:0;opacity:1} 100%{top:100%;opacity:0}
+  }
+  .corner {
+    position:absolute; width:12px; height:12px;
+    border-color:var(--accent); border-style:solid;
+  }
+  .corner.tl { top:-2px;left:-2px;border-width:2px 0 0 2px; }
+  .corner.tr { top:-2px;right:-2px;border-width:2px 2px 0 0; }
+  .corner.bl { bottom:-2px;left:-2px;border-width:0 0 2px 2px; }
+  .corner.br { bottom:-2px;right:-2px;border-width:0 2px 2px 0; }
+
+  /* Detection result popup */
+  .detect-popup {
+    position:absolute; top:16px; right:16px;
+    background:rgba(0,255,136,0.1);
+    border:1px solid rgba(0,255,136,0.5);
+    border-radius:10px;
+    padding:12px 16px;
+    min-width:200px;
+    backdrop-filter:blur(8px);
+    transform:scale(0); opacity:0;
+    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), opacity 0.3s;
+  }
+  .detect-popup.show { transform:scale(1); opacity:1; }
+  .detect-popup.not-found {
+    background:rgba(255,51,85,0.1);
+    border-color:rgba(255,51,85,0.5);
+  }
+  .detect-label { font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:4px; }
+  .detect-plate { font-family:'Orbitron',monospace; font-size:18px; font-weight:700; color:var(--green); }
+  .detect-popup.not-found .detect-plate { color:var(--red); }
+  .detect-info { font-size:11px; color:var(--muted); margin-top:4px; }
+  .detect-conf { font-size:11px; color:var(--green); font-weight:600; }
+
+  /* Bottom controls */
+  .camera-controls {
+    display:flex; gap:12px; padding:16px 20px;
+    border-top:1px solid var(--border);
+    flex-wrap:wrap;
+  }
+  .btn {
+    display:flex; align-items:center; gap:8px;
+    padding:10px 20px; border-radius:8px;
+    font-family:'Sarabun',sans-serif; font-size:14px; font-weight:600;
+    cursor:pointer; border:none; transition:all 0.2s;
+  }
+  .btn-primary {
+    background:linear-gradient(135deg,var(--accent),#0066ff);
+    color:#000; box-shadow:var(--glow);
+  }
+  .btn-primary:hover { transform:translateY(-1px); box-shadow:0 0 30px rgba(0,212,255,0.5); }
+  .btn-success {
+    background:rgba(0,255,136,0.15);
+    color:var(--green); border:1px solid rgba(0,255,136,0.4);
+  }
+  .btn-success:hover { background:rgba(0,255,136,0.25); }
+  .btn-danger {
+    background:rgba(255,51,85,0.15);
+    color:var(--red); border:1px solid rgba(255,51,85,0.4);
+  }
+  .btn-danger:hover { background:rgba(255,51,85,0.25); }
+  .btn-secondary {
+    background:var(--card); color:var(--muted);
+    border:1px solid var(--border);
+  }
+  .btn-secondary:hover { color:var(--text); border-color:var(--accent); }
+  .btn:active { transform:scale(0.97); }
+
+  /* RIGHT PANEL */
+  .right-panel { display:flex; flex-direction:column; gap:16px; }
+
+  /* Add form */
+  .add-form {
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:16px;
+    overflow:hidden;
+  }
+  .form-body { padding:16px; }
+  .form-group { margin-bottom:12px; }
+  .form-label { font-size:12px; color:var(--muted); margin-bottom:6px; display:block; text-transform:uppercase; letter-spacing:1px; }
+  .form-input {
+    width:100%; padding:10px 14px;
+    background:var(--card); color:var(--text);
+    border:1px solid var(--border); border-radius:8px;
+    font-family:'Sarabun',sans-serif; font-size:14px;
+    transition:border-color 0.2s, box-shadow 0.2s;
+    outline:none;
+  }
+  .form-input:focus { border-color:var(--accent); box-shadow:0 0 0 3px rgba(0,212,255,0.1); }
+  .form-input::placeholder { color:var(--muted); }
+  .form-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .color-row {
+    display:flex; gap:8px; flex-wrap:wrap;
+  }
+  .color-dot {
+    width:28px; height:28px; border-radius:50%;
+    cursor:pointer; border:2px solid transparent;
+    transition:transform 0.2s, border-color 0.2s;
+    flex-shrink:0;
+  }
+  .color-dot:hover { transform:scale(1.1); }
+  .color-dot.active { border-color:#fff; transform:scale(1.15); }
+
+  /* Car list */
+  .car-list-panel {
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:16px;
+    overflow:hidden;
+    flex:1;
+  }
+  .car-list { max-height:420px; overflow-y:auto; }
+  .car-list::-webkit-scrollbar { width:4px; }
+  .car-list::-webkit-scrollbar-track { background:transparent; }
+  .car-list::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+
+  .car-item {
+    display:flex; align-items:center; gap:12px;
+    padding:12px 16px;
+    border-bottom:1px solid var(--border);
+    cursor:pointer;
+    transition:background 0.15s;
+    position:relative;
+  }
+  .car-item:last-child { border-bottom:none; }
+  .car-item:hover { background:rgba(0,212,255,0.05); }
+  .car-item.active { background:rgba(0,212,255,0.08); }
+  .car-item.active::before {
+    content:''; position:absolute; left:0; top:0; bottom:0; width:3px;
+    background:var(--accent); border-radius:2px;
+  }
+  .car-color-swatch {
+    width:36px; height:36px; border-radius:8px;
+    flex-shrink:0; display:flex; align-items:center; justify-content:center;
+    font-size:18px;
+  }
+  .car-info { flex:1; min-width:0; }
+  .car-plate-text {
+    font-family:'Orbitron',monospace; font-size:13px; font-weight:700;
+    color:var(--text);
+  }
+  .car-meta { font-size:11px; color:var(--muted); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .car-status {
+    font-size:10px; padding:2px 8px; border-radius:10px; font-weight:600;
+  }
+  .car-status.in { background:rgba(0,255,136,0.15); color:var(--green); border:1px solid rgba(0,255,136,0.3); }
+  .car-status.out { background:rgba(90,122,181,0.15); color:var(--muted); border:1px solid rgba(90,122,181,0.3); }
+  .btn-delete-car {
+    width:28px; height:28px; border-radius:6px;
+    background:rgba(255,51,85,0.1); border:1px solid rgba(255,51,85,0.2);
+    color:var(--red); cursor:pointer; font-size:14px;
+    display:flex; align-items:center; justify-content:center;
+    transition:all 0.2s; flex-shrink:0;
+    opacity:0;
+  }
+  .car-item:hover .btn-delete-car { opacity:1; }
+  .btn-delete-car:hover { background:rgba(255,51,85,0.25); }
+
+  /* Log */
+  .log-panel {
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:16px;
+    overflow:hidden;
+    margin-top:24px;
+  }
+  .log-list { max-height:180px; overflow-y:auto; }
+  .log-list::-webkit-scrollbar { width:4px; }
+  .log-list::-webkit-scrollbar-thumb { background:var(--border); border-radius:2px; }
+  .log-item {
+    display:flex; align-items:center; gap:12px;
+    padding:10px 16px;
+    border-bottom:1px solid rgba(30,45,84,0.5);
+    font-size:12px;
+    animation: fadeIn 0.3s ease;
+  }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(-4px)} to{opacity:1;transform:translateY(0)} }
+  .log-time { color:var(--muted); font-family:'Orbitron',monospace; font-size:10px; flex-shrink:0; }
+  .log-icon { font-size:14px; flex-shrink:0; }
+  .log-text { flex:1; color:var(--text); }
+  .log-plate { font-family:'Orbitron',monospace; font-weight:700; }
+  .log-found .log-plate { color:var(--green); }
+  .log-not-found .log-plate { color:var(--red); }
+
+  /* Empty state */
+  .empty-state {
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:40px; color:var(--muted); text-align:center; gap:8px;
+  }
+  .empty-state .icon { font-size:36px; opacity:0.4; }
+  .empty-state p { font-size:13px; }
+
+  /* Modal */
+  .modal-backdrop {
+    position:fixed; inset:0; background:rgba(0,0,0,0.7);
+    display:flex; align-items:center; justify-content:center;
+    z-index:1000; opacity:0; pointer-events:none;
+    transition:opacity 0.2s;
+    backdrop-filter:blur(4px);
+  }
+  .modal-backdrop.show { opacity:1; pointer-events:all; }
+  .modal {
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:24px; width:340px;
+    box-shadow:0 20px 60px rgba(0,0,0,0.5), var(--glow);
+    transform:scale(0.9);
+    transition:transform 0.2s;
+  }
+  .modal-backdrop.show .modal { transform:scale(1); }
+  .modal h3 { font-family:'Orbitron',monospace; font-size:16px; color:var(--accent); margin-bottom:16px; }
+  .modal-actions { display:flex; gap:10px; margin-top:20px; justify-content:flex-end; }
+
+  @media(max-width:900px) {
+    .main-grid { grid-template-columns:1fr; }
+    .stats-row { grid-template-columns:repeat(2,1fr); }
+    .right-panel { order:-1; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo-icon">🔍</div>
+    <div class="header-title">
+      <h1>LPR SYSTEM</h1>
+      <p>ระบบตรวจจับและจดจำป้ายทะเบียนรถยนต์</p>
+    </div>
+    <div class="status-badge">
+      <div class="dot"></div>
+      ระบบทำงานปกติ
+    </div>
+  </header>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card blue">
+      <div class="stat-label">ยานพาหนะทั้งหมด</div>
+      <div class="stat-value" id="statTotal">0</div>
+    </div>
+    <div class="stat-card green">
+      <div class="stat-label">ตรวจพบวันนี้</div>
+      <div class="stat-value" id="statDetected">0</div>
+    </div>
+    <div class="stat-card orange">
+      <div class="stat-label">ไม่พบในระบบ</div>
+      <div class="stat-value" id="statUnknown">0</div>
+    </div>
+    <div class="stat-card yellow">
+      <div class="stat-label">ความแม่นยำ</div>
+      <div class="stat-value" id="statAccuracy">—</div>
+    </div>
+  </div>
+
+  <!-- MAIN GRID -->
+  <div class="main-grid">
+    <!-- Camera -->
+    <div>
+      <div class="camera-panel">
+        <div class="panel-header">
+          <div class="panel-title">📷 CAMERA FEED — CAM01</div>
+          <div style="font-size:11px;color:var(--muted);font-family:'Orbitron',monospace" id="timeDisplay">--:--:--</div>
+        </div>
+        <div class="camera-view">
+          <div class="road-scene">
+            <!-- Sky gradient -->
+            <div style="position:absolute;top:0;left:0;right:0;height:45%;background:linear-gradient(180deg,#0a0e1a 0%,#0f1628 100%)"></div>
+            <!-- Stars -->
+            <div id="stars" style="position:absolute;top:0;left:0;right:0;height:45%;"></div>
+            <!-- Road -->
+            <div class="road">
+              <div class="road-line"></div>
+              <div class="road-edge-left"></div>
+              <div class="road-edge-right"></div>
+            </div>
+            <!-- Car -->
+            <div class="car-container" id="carContainer">
+              <div class="car-body" id="carBody">
+                <div class="car-roof"></div>
+                <div class="car-window"></div>
+                <div class="car-lights front">
+                  <div class="light"></div>
+                  <div class="light"></div>
+                </div>
+                <div class="car-lights back" style="right:4px;left:auto;">
+                  <div class="light red"></div>
+                  <div class="light red"></div>
+                </div>
+                <div class="car-wheels">
+                  <div class="wheel"></div>
+                  <div class="wheel"></div>
+                </div>
+                <div class="plate-on-car" id="plateOnCar">กข 1234</div>
+              </div>
+            </div>
+            <!-- Scan overlay -->
+            <div class="scan-overlay">
+              <div class="scan-frame">
+                <div class="scan-line"></div>
+                <div class="corner tl"></div>
+                <div class="corner tr"></div>
+                <div class="corner bl"></div>
+                <div class="corner br"></div>
+              </div>
+            </div>
+            <!-- Detection popup -->
+            <div class="detect-popup" id="detectPopup">
+              <div class="detect-label">ตรวจพบป้ายทะเบียน</div>
+              <div class="detect-plate" id="detectPlateText">—</div>
+              <div class="detect-info" id="detectInfo">—</div>
+              <div class="detect-conf" id="detectConf">ความแม่นยำ: —</div>
+            </div>
+          </div>
+        </div>
+        <div class="camera-controls">
+          <button class="btn btn-primary" onclick="simulateScan()">🔍 สแกนป้ายทะเบียน</button>
+          <button class="btn btn-success" onclick="autoScan()">⚡ สแกนอัตโนมัติ</button>
+          <button class="btn btn-secondary" onclick="randomCar()">🔀 สุ่มรถ</button>
+          <button class="btn btn-secondary" id="autoBtn" style="display:none" onclick="stopAuto()">⏹ หยุด</button>
+        </div>
+      </div>
+
+      <!-- Log -->
+      <div class="log-panel" style="margin-top:16px">
+        <div class="panel-header">
+          <div class="panel-title">📋 บันทึกการตรวจจับ</div>
+          <button class="btn btn-secondary" style="padding:4px 12px;font-size:11px" onclick="clearLog()">ล้าง</button>
+        </div>
+        <div class="log-list" id="logList">
+          <div class="empty-state">
+            <div class="icon">📋</div>
+            <p>ยังไม่มีรายการบันทึก</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right panel -->
+    <div class="right-panel">
+      <!-- Add form -->
+      <div class="add-form">
+        <div class="panel-header">
+          <div class="panel-title">➕ เพิ่มยานพาหนะ</div>
+        </div>
+        <div class="form-body">
+          <div class="form-group">
+            <label class="form-label">ป้ายทะเบียน</label>
+            <input class="form-input" id="inputPlate" placeholder="เช่น กข 1234" maxlength="15">
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">จังหวัด</label>
+              <input class="form-input" id="inputProvince" placeholder="กรุงเทพมหานคร">
+            </div>
+            <div class="form-group">
+              <label class="form-label">ประเภทรถ</label>
+              <select class="form-input" id="inputType">
+                <option>รถยนต์ส่วนตัว</option>
+                <option>รถกระบะ</option>
+                <option>รถตู้</option>
+                <option>รถบัส</option>
+                <option>รถบรรทุก</option>
+                <option>มอเตอร์ไซค์</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">สีรถ</label>
+            <div class="color-row" id="colorPicker"></div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">เจ้าของ</label>
+            <input class="form-input" id="inputOwner" placeholder="ชื่อเจ้าของ (ไม่บังคับ)">
+          </div>
+          <button class="btn btn-success" style="width:100%;justify-content:center" onclick="addCar()">✅ เพิ่มยานพาหนะ</button>
+        </div>
+      </div>
+
+      <!-- Car list -->
+      <div class="car-list-panel">
+        <div class="panel-header">
+          <div class="panel-title">🚗 รายการยานพาหนะ</div>
+          <span style="font-size:11px;color:var(--muted)" id="carCount">0 คัน</span>
+        </div>
+        <div class="car-list" id="carList">
+          <div class="empty-state">
+            <div class="icon">🚗</div>
+            <p>ยังไม่มียานพาหนะในระบบ</p>
+            <p>กดเพิ่มยานพาหนะด้านบน</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Modal -->
+<div class="modal-backdrop" id="deleteModal">
+  <div class="modal">
+    <h3>⚠️ ลบยานพาหนะ</h3>
+    <p style="color:var(--muted);font-size:14px">คุณต้องการลบ <span id="deleteTargetPlate" style="color:var(--red);font-family:'Orbitron',monospace;font-weight:700"></span> ออกจากระบบใช่หรือไม่?</p>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal()">ยกเลิก</button>
+      <button class="btn btn-danger" onclick="confirmDelete()">ลบ</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ====== DATA ======
+const COLORS = [
+  {hex:'#2563eb',name:'น้ำเงิน',emoji:'🔵'},
+  {hex:'#dc2626',name:'แดง',emoji:'🔴'},
+  {hex:'#16a34a',name:'เขียว',emoji:'🟢'},
+  {hex:'#d97706',name:'ส้ม',emoji:'🟠'},
+  {hex:'#7c3aed',name:'ม่วง',emoji:'🟣'},
+  {hex:'#6b7280',name:'เทา',emoji:'⚫'},
+  {hex:'#f9fafb',name:'ขาว',emoji:'⚪'},
+  {hex:'#b45309',name:'น้ำตาล',emoji:'🟤'},
+];
+
+let cars = [
+  {id:1, plate:'กข 1234', province:'กรุงเทพมหานคร', type:'รถยนต์ส่วนตัว', color:'#2563eb', owner:'สมชาย ใจดี', status:'out'},
+  {id:2, plate:'ชม 5678', province:'เชียงใหม่', type:'รถกระบะ', color:'#dc2626', owner:'มานี รักดี', status:'out'},
+  {id:3, plate:'นว 9012', province:'นครสวรรค์', type:'รถตู้', color:'#16a34a', owner:'', status:'out'},
+];
+let nextId = 4;
+let selectedColor = '#2563eb';
+let deleteTargetId = null;
+let autoInterval = null;
+let currentCarIdx = 0;
+let stats = { detected:0, unknown:0, total:0, correct:0 };
+
+// ====== INIT ======
+function init() {
+  buildColorPicker();
+  buildStars();
+  renderCarList();
+  updateStats();
+  updateClock();
+  setInterval(updateClock, 1000);
+  loadCurrentCar();
+}
+
+function buildColorPicker() {
+  const el = document.getElementById('colorPicker');
+  el.innerHTML = COLORS.map((c,i) => `
+    <div class="color-dot ${i===0?'active':''}" 
+         style="background:${c.hex}" 
+         title="${c.name}"
+         onclick="selectColor('${c.hex}',this)"></div>
+  `).join('');
+}
+
+function buildStars() {
+  const el = document.getElementById('stars');
+  let html = '';
+  for(let i=0;i<30;i++){
+    const x=Math.random()*100, y=Math.random()*100, s=Math.random()*2+0.5, op=Math.random()*0.6+0.2;
+    html += `<div style="position:absolute;left:${x}%;top:${y}%;width:${s}px;height:${s}px;background:#fff;border-radius:50%;opacity:${op};animation:pulse ${1+Math.random()*2}s ease-in-out infinite;animation-delay:${Math.random()*2}s"></div>`;
+  }
+  el.innerHTML = html;
+}
+
+function updateClock() {
+  document.getElementById('timeDisplay').textContent = new Date().toLocaleTimeString('th-TH',{hour12:false});
+}
+
+// ====== COLOR PICKER ======
+function selectColor(hex, el) {
+  selectedColor = hex;
+  document.querySelectorAll('.color-dot').forEach(d=>d.classList.remove('active'));
+  el.classList.add('active');
+}
+
+// ====== RENDER ======
+function renderCarList() {
+  const list = document.getElementById('carList');
+  const count = document.getElementById('carCount');
+  count.textContent = `${cars.length} คัน`;
+  if(!cars.length) {
+    list.innerHTML = `<div class="empty-state"><div class="icon">🚗</div><p>ยังไม่มียานพาหนะในระบบ</p><p>กดเพิ่มยานพาหนะด้านบน</p></div>`;
+    return;
+  }
+  list.innerHTML = cars.map((c,i) => `
+    <div class="car-item ${i===currentCarIdx?'active':''}" onclick="selectCar(${i})">
+      <div class="car-color-swatch" style="background:${c.color}20;border:1px solid ${c.color}40">
+        <span style="color:${c.color};font-size:20px">🚗</span>
+      </div>
+      <div class="car-info">
+        <div class="car-plate-text">${c.plate}</div>
+        <div class="car-meta">${c.type} • ${c.province}${c.owner?` • ${c.owner}`:''}</div>
+      </div>
+      <span class="car-status ${c.status}">${c.status==='in'?'พบแล้ว':'รอตรวจ'}</span>
+      <button class="btn-delete-car" onclick="event.stopPropagation();openDeleteModal(${c.id})" title="ลบ">✕</button>
+    </div>
+  `).join('');
+}
+
+function updateStats() {
+  stats.total = cars.length;
+  document.getElementById('statTotal').textContent = stats.total;
+  document.getElementById('statDetected').textContent = stats.detected;
+  document.getElementById('statUnknown').textContent = stats.unknown;
+  const total = stats.detected + stats.unknown;
+  document.getElementById('statAccuracy').textContent = total>0 ? Math.round((stats.detected/total)*100)+'%' : '—';
+}
+
+// ====== CAR SELECTION ======
+function selectCar(idx) {
+  currentCarIdx = idx;
+  loadCurrentCar();
+  renderCarList();
+}
+
+function loadCurrentCar() {
+  if(!cars.length) return;
+  const car = cars[currentCarIdx] || cars[0];
+  document.getElementById('carBody').style.background = car.color;
+  document.getElementById('plateOnCar').textContent = car.plate;
+}
+
+function randomCar() {
+  if(!cars.length) return;
+  currentCarIdx = Math.floor(Math.random()*cars.length);
+  loadCurrentCar();
+  renderCarList();
+}
+
+// ====== ADD CAR ======
+function addCar() {
+  const plate = document.getElementById('inputPlate').value.trim();
+  const province = document.getElementById('inputProvince').value.trim() || 'ไม่ระบุ';
+  const type = document.getElementById('inputType').value;
+  const owner = document.getElementById('inputOwner').value.trim();
+  if(!plate){alert('กรุณาระบุป้ายทะเบียน');return;}
+  if(cars.some(c=>c.plate.replace(/\s/g,'').toLowerCase()===plate.replace(/\s/g,'').toLowerCase())){
+    alert('ป้ายทะเบียนนี้มีในระบบแล้ว');return;
+  }
+  cars.push({id:nextId++, plate, province, type, color:selectedColor, owner, status:'out'});
+  document.getElementById('inputPlate').value='';
+  document.getElementById('inputProvince').value='';
+  document.getElementById('inputOwner').value='';
+  addLog('add',`เพิ่มยานพาหนะ ${plate} เข้าระบบ`,'➕',null);
+  renderCarList();
+  updateStats();
+}
+
+// ====== DELETE ======
+function openDeleteModal(id) {
+  deleteTargetId = id;
+  const car = cars.find(c=>c.id===id);
+  document.getElementById('deleteTargetPlate').textContent = car ? car.plate : '';
+  document.getElementById('deleteModal').classList.add('show');
+}
+function closeModal() {
+  document.getElementById('deleteModal').classList.remove('show');
+  deleteTargetId = null;
+}
+function confirmDelete() {
+  if(deleteTargetId===null) return;
+  const car = cars.find(c=>c.id===deleteTargetId);
+  cars = cars.filter(c=>c.id!==deleteTargetId);
+  if(currentCarIdx>=cars.length) currentCarIdx=Math.max(0,cars.length-1);
+  closeModal();
+  addLog('delete',`ลบยานพาหนะ ${car.plate} ออกจากระบบ`,'🗑️',null);
+  renderCarList();
+  updateStats();
+  if(cars.length) loadCurrentCar();
+}
+
+// ====== SCAN ======
+function simulateScan() {
+  if(!cars.length){alert('กรุณาเพิ่มยานพาหนะในระบบก่อน');return;}
+  const car = cars[currentCarIdx] || cars[0];
+  const found = Math.random() > 0.15;
+  const conf = (85+Math.random()*14).toFixed(1);
+  const popup = document.getElementById('detectPopup');
+  popup.classList.remove('show','not-found');
+  void popup.offsetWidth;
+
+  if(found) {
+    car.status='in';
+    stats.detected++;
+    stats.correct++;
+    document.getElementById('detectPlateText').textContent = car.plate;
+    document.getElementById('detectInfo').textContent = `${car.type} • ${car.province}${car.owner?' • '+car.owner:''}`;
+    document.getElementById('detectConf').textContent = `ความแม่นยำ: ${conf}%`;
+    popup.classList.add('show');
+    addLog('found',car.plate,'✅',car);
+  } else {
+    const fakePlate = generateFakePlate();
+    stats.unknown++;
+    document.getElementById('detectPlateText').textContent = fakePlate;
+    document.getElementById('detectInfo').textContent = 'ไม่พบในฐานข้อมูล';
+    document.getElementById('detectConf').textContent = `ความแม่นยำ: ${conf}%`;
+    popup.classList.add('show','not-found');
+    addLog('not-found',fakePlate,'❌',null);
+  }
+  setTimeout(()=>popup.classList.remove('show','not-found'),4000);
+  renderCarList();
+  updateStats();
+}
+
+function generateFakePlate() {
+  const chars='กขคงจฉชซญดตถทธนบปพฟภมยรลวศสห';
+  const a=chars[Math.floor(Math.random()*chars.length)];
+  const b=chars[Math.floor(Math.random()*chars.length)];
+  const num=Math.floor(1000+Math.random()*9000);
+  return `${a}${b} ${num}`;
+}
+
+let autoRunning = false;
+function autoScan() {
+  if(autoRunning) return;
+  autoRunning = true;
+  document.querySelector('.btn-success').style.display='none';
+  document.getElementById('autoBtn').style.display='flex';
+  autoInterval = setInterval(()=>{
+    randomCar();
+    setTimeout(simulateScan,400);
+  },2500);
+}
+function stopAuto() {
+  clearInterval(autoInterval);
+  autoRunning=false;
+  document.querySelector('.btn-success').style.display='flex';
+  document.getElementById('autoBtn').style.display='none';
+}
+
+// ====== LOG ======
+function addLog(type, text, icon, car) {
+  const list = document.getElementById('logList');
+  const empty = list.querySelector('.empty-state');
+  if(empty) list.innerHTML='';
+  const time = new Date().toLocaleTimeString('th-TH',{hour12:false});
+  const div = document.createElement('div');
+  div.className = `log-item ${type==='found'?'log-found':type==='not-found'?'log-not-found':''}`;
+  div.innerHTML = `
+    <span class="log-time">${time}</span>
+    <span class="log-icon">${icon}</span>
+    <span class="log-text">
+      ${type==='found'?`ตรวจพบ <span class="log-plate">${text}</span>${car?` (${car.owner||car.type})`:''}`:''}
+      ${type==='not-found'?`ไม่พบ <span class="log-plate">${text}</span> ในระบบ`:''}
+      ${type==='add'||type==='delete'?text:''}
+    </span>
+  `;
+  list.insertBefore(div, list.firstChild);
+  while(list.children.length>50) list.removeChild(list.lastChild);
+}
+function clearLog() {
+  document.getElementById('logList').innerHTML='<div class="empty-state"><div class="icon">📋</div><p>ยังไม่มีรายการบันทึก</p></div>';
+}
+
+// ====== START ======
+document.getElementById('deleteModal').addEventListener('click',function(e){if(e.target===this)closeModal();});
+init();
+</script>
+</body>
+</html>
